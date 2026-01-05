@@ -60,10 +60,29 @@ export const readDB = () => {
 // Write database
 export const writeDB = (data) => {
   try {
+    // Ensure directory exists
+    const dbDir = dirname(DB_PATH);
+    try {
+      mkdirSync(dbDir, { recursive: true });
+    } catch (e) {
+      // Directory might already exist, ignore
+    }
+    
     writeFileSync(DB_PATH, JSON.stringify(data, null, 2), 'utf8');
-    return true;
+    
+    // Verify write was successful
+    if (existsSync(DB_PATH)) {
+      const written = readFileSync(DB_PATH, 'utf8');
+      const parsed = JSON.parse(written);
+      console.log(`[writeDB] Successfully wrote ${parsed.accessLogs?.length || 0} logs to ${DB_PATH}`);
+      return true;
+    } else {
+      console.error('[writeDB] File was not created:', DB_PATH);
+      return false;
+    }
   } catch (error) {
-    console.error('Error writing database:', error);
+    console.error('[writeDB] Error writing database:', error);
+    console.error('[writeDB] DB_PATH:', DB_PATH);
     return false;
   }
 };
