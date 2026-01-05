@@ -1,5 +1,5 @@
 import express from 'express';
-import { getCardByUID, createOTPSession, verifyOTPSession, addAccessLog } from '../services/database.js';
+import { getCardByUID, createOTPSession, verifyOTPSession, addAccessLog, readDB } from '../services/database.js';
 import { generateOTP } from '../services/otpService.js';
 import { sendOTPEmail } from '../services/emailService.js';
 
@@ -166,11 +166,27 @@ router.post('/log-access', (req, res) => {
 
     // Ghi log
     const message = success ? 'Access Granted' : 'Access Denied';
-    addAccessLog(cardId, rfid_uid, success ? 'success' : 'failed', message, req.ip);
+    const savedLog = addAccessLog(cardId, rfid_uid, success ? 'success' : 'failed', message, req.ip);
+
+    // Log for debugging
+    console.log(`[POST /api/esp32/log-access] Log saved:`, {
+      rfid_uid,
+      cardId,
+      success,
+      logId: savedLog.id,
+      timestamp: savedLog.timestamp
+    });
+
+    // Verify log was saved by reading back
+    const db = readDB();
+    const totalLogs = db.accessLogs.length;
+    console.log(`[POST /api/esp32/log-access] Total logs in DB: ${totalLogs}`);
 
     res.json({
       success: true,
-      message: 'Log saved'
+      message: 'Log saved',
+      logId: savedLog.id,
+      totalLogs: totalLogs
     });
   } catch (error) {
     console.error('Error in log-access:', error);

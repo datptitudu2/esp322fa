@@ -20,6 +20,11 @@ router.get('/logs', (req, res) => {
       };
     });
 
+    // Log for debugging (only in development)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[GET /api/access/logs] Returning ${enrichedLogs.length} logs`);
+    }
+
     res.json({
       success: true,
       logs: enrichedLogs,
