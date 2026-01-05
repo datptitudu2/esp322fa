@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -146,7 +146,24 @@ export const addAccessLog = (cardId, uid, status, message, ip = '') => {
   if (db.accessLogs.length > 1000) {
     db.accessLogs = db.accessLogs.slice(0, 1000);
   }
-  writeDB(db);
+  
+  // Write to database and verify
+  const writeSuccess = writeDB(db);
+  if (!writeSuccess) {
+    console.error('[addAccessLog] Failed to write database!');
+  }
+  
+  // Verify log was saved
+  const verifyDb = readDB();
+  const savedLog = verifyDb.accessLogs.find(l => l.id === log.id);
+  if (!savedLog) {
+    console.error('[addAccessLog] Log was not saved! Log ID:', log.id);
+    console.error('[addAccessLog] DB_PATH:', DB_PATH);
+    console.error('[addAccessLog] File exists:', existsSync(DB_PATH));
+  } else {
+    console.log(`[addAccessLog] Log saved successfully. Total logs: ${verifyDb.accessLogs.length}`);
+  }
+  
   return log;
 };
 
