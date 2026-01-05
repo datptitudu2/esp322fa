@@ -25,7 +25,10 @@ export default function AccessHistory() {
       
       setLogs(filteredLogs);
     } catch (error) {
-      console.error('Error loading logs:', error);
+      // Silent error handling for production
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error loading logs:', error);
+      }
     } finally {
       setLoading(false);
     }

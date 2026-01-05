@@ -24,7 +24,10 @@ export default function Home() {
       const response = await getCards();
       setCards(response.cards || []);
     } catch (error) {
-      console.error('Error loading cards:', error);
+      // Silent error handling for production
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error loading cards:', error);
+      }
     }
   };
 

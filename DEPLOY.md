@@ -30,15 +30,19 @@
 
 **Environment:** `Node`
 
+**Root Directory:** `backend` ⭐ (Quan trọng!)
+
 **Build Command:**
 ```bash
-cd backend && npm install
+npm install
 ```
 
 **Start Command:**
 ```bash
-cd backend && npm start
+npm start
 ```
+
+**Lưu ý:** Nếu không set Root Directory, thì Build/Start Command phải dùng `cd backend && npm install` và `cd backend && npm start`
 
 **Plan:** Free (hoặc Starter nếu cần)
 
@@ -74,29 +78,36 @@ Thêm các biến môi trường sau:
 
 ### Bước 2: Cấu hình Frontend Service
 
-**Name:** `2fa-rfid-frontend`
+**Name:** `esp322fa-frontend` (hoặc tên bạn muốn)
 
 **Environment:** `Node`
 
+**Root Directory:** `frontend` ⭐ (QUAN TRỌNG!)
+
 **Build Command:**
 ```bash
-cd frontend && npm install && npm run build
+npm install && npm run build
 ```
 
 **Start Command:**
 ```bash
-cd frontend && npm start
+npm start
 ```
 
 **Plan:** Free
+
+**Lưu ý:** Nếu không set Root Directory, thì Build/Start Command phải dùng `cd frontend && npm install && npm run build` và `cd frontend && npm start`
 
 ### Bước 3: Environment Variables
 
 | Key | Value | Mô tả |
 |-----|-------|-------|
-| `NEXT_PUBLIC_API_URL` | `https://your-backend.onrender.com` | URL backend vừa deploy |
+| `NEXT_PUBLIC_API_URL` | `https://esp322fa.onrender.com` | URL backend đã deploy |
+| `NODE_ENV` | `production` | Môi trường production |
 
-**Lưu ý:** Thay `your-backend.onrender.com` bằng URL backend thực tế
+**Lưu ý:** 
+- `NEXT_PUBLIC_API_URL` phải trỏ đến backend Render: `https://esp322fa.onrender.com`
+- Không có dấu `/` ở cuối URL
 
 ### Bước 4: Deploy
 

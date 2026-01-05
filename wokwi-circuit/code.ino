@@ -36,7 +36,7 @@
  // ========== WIFI CONFIG ==========
  const char* ssid = "Wokwi-GUEST";  // Wokwi simulation WiFi
  const char* password = "";
- const char* serverURL = "http://localhost:3001";  // Port của backend// Server gửi email OTP
+ const char* serverURL = "https://esp322fa.onrender.com";  // Backend deployed on Render
  
  // ========== RFID DATABASE ==========
  String validCards[] = {"A1B2C3D4", "E5F6G7H8", "I9J0K1L2"};
@@ -742,20 +742,15 @@
  
 // ========== GỬI LOG LÊN SERVER ==========
 void sendLogToServer(String cardUID, String userName, bool success) {
-  // LƯU Ý: Trong Wokwi simulation, ESP32 không thể kết nối đến localhost
-  // Vì Wokwi chạy trên server của họ, không phải máy local của bạn
-  // 
-  // Giải pháp:
-  // 1. Nếu deploy backend lên Render/Heroku, cập nhật serverURL ở trên
-  // 2. Hoặc verify OTP trên web app (localhost:3000) - backend sẽ tự động ghi log
-  // 3. Log từ ESP32 chỉ là bổ sung, không bắt buộc cho demo
+  // Backend đã deploy lên Render: https://esp322fa.onrender.com
+  // ESP32 trong Wokwi có thể kết nối đến URL public này
   
   HTTPClient http;
   String url = String(serverURL) + "/api/esp32/log-access";
   
   http.begin(url);
   http.addHeader("Content-Type", "application/json");
-  http.setTimeout(3000); // Giảm timeout xuống 3 giây cho Wokwi
+  http.setTimeout(5000); // Tăng timeout lên 5 giây cho Render (có thể chậm khi sleep)
   
   // Tạo timestamp ISO format
   String timestamp = getCurrentTimeISO();
@@ -776,12 +771,13 @@ void sendLogToServer(String cardUID, String userName, bool success) {
   if (httpResponseCode == 200) {
     String response = http.getString();
     Serial.println(">>> ✓✓✓ Log da duoc gui len server thanh cong!");
+    Serial.println(">>> Response: " + response);
   } else {
-    // Trong Wokwi, không kết nối được localhost là bình thường
     Serial.println(">>> ⚠️ Khong gui duoc log tu ESP32 (code: " + String(httpResponseCode) + ")");
-    Serial.println(">>>    Day la binh thuong trong Wokwi simulation");
-    Serial.println(">>>    Log se duoc ghi tu web app khi verify OTP");
-    Serial.println(">>>    Hoac deploy backend len Render va cap nhat serverURL");
+    Serial.println(">>>    Kiem tra:");
+    Serial.println(">>>    1. Backend da wake up chua? (Render free tier sleep sau 15 phut)");
+    Serial.println(">>>    2. URL backend dung chua? (" + String(serverURL) + ")");
+    Serial.println(">>>    3. WiFi da ket noi chua?");
   }
   
   http.end();
